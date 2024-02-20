@@ -11,10 +11,14 @@ class ProjectController extends Controller
     public function index()
     {
         request()->validate([
-            'key' => ['nullable', 'string', 'min:3', ]
+            'key' => ['nullable', 'string', 'min:3',]
         ]);
 
-        $projects = Project::with('type', 'technologies')->paginate(9);
+        if (request()->key) {
+            $projects = Project::where('title', 'LIKE', '%'.request()->key.'%')->orWhere('description', 'LIKE', '%'.request()->key.'%')->paginate(9);
+        } else {
+            $projects = Project::with('type', 'technologies')->paginate(9);
+        };
 
         return response()->json([
             'status' => true,
